@@ -23,3 +23,7 @@ npm test
 ```
 gulp
 ```
+
+### Env file
+
+Create .env file for production & .env.dev file for the development.
