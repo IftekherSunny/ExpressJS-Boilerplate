@@ -1,5 +1,6 @@
 const path          = require('path');
-const logger        = require('morgan');
+const morgan        = require('morgan');
+const logger        = require('express-logger');
 const express       = require('express');
 const favicon       = require('serve-favicon');
 const session       = require('express-session');
@@ -18,7 +19,7 @@ const app = express();
 
 
 /**
- * Required dotenv
+ * Required dotenv.
  */
 
  // development env
@@ -27,9 +28,9 @@ const app = express();
  }
 
  // production env
- app.use(function(err, req, res, next) {
+ if (app.get('env') === 'production') {
    require('dotenv').config({path: '.env'});
- });
+ }
 
 
 
@@ -39,26 +40,38 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.engine('handlebars', handlebars({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
-app.enable('view cache');
+if(app.get('env') === 'production') {
+  app.enable('view cache');
+}
 
 
 
 /**
  * Register middlewares.
  */
-//uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+
+app.use(morgan('dev'));
+
+if(app.get('env') === 'production') {
+  app.use(logger({path: __dirname + "/logs/express.log"}));
+}
+
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(cookieParser());
+
 //app.use(session({ name: 'express_app', secret: process.env.APP_SECRET, resave: true, saveUninitialized: true, cookie: { secure: false, maxAge: 60000 } }))
+
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(validator({
  errorFormatter: function(param, msg, value) {
-     var namespace = param.split('.')
-     , root    = namespace.shift()
-     , formParam = root;
+     var namespace = param.split('.');
+     var root = namespace.shift();
+     var formParam = root;
 
      while(namespace.length) {
        formParam += '[' + namespace.shift() + ']';
@@ -73,16 +86,7 @@ app.use(validator({
  /**
   * Mongoose connection.
   */
-
-  // mongoose development connection
- if (app.get('env') === 'development') {
-   mongoose.connect('mongodb://localhost/' + process.env.DB_NAME);
- }
-
- // mongoose production connection
- app.use(function(err, req, res, next) {
-   mongoose.connect('mongodb://localhost/' + process.env.DB_NAME);
- });
+  mongoose.connect('mongodb://' + process.env.DB_HOST + '/' + process.env.DB_NAME);
 
 
 
