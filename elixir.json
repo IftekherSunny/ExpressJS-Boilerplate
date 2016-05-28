@@ -1,5 +1,31 @@
 {
   "assetsPath": "assets",
 
-  "publicPath": "public/assets"
+  "publicPath": "public/assets",
+
+  "js": {
+    "babel": {
+      "options": {
+        "presets": [
+          "es2015", "react", "stage-1"
+        ],
+
+        "plugins": ["transform-decorators-legacy"]
+      }
+    },
+
+    "browserify": {
+      "transformers": [{
+          "name": "babelify",
+
+          "options": {
+            "presets": [
+              "es2015", "react", "stage-1"
+            ],
+
+            "plugins": ["transform-decorators-legacy"]
+          }
+        }]
+    }
+  }
 }
