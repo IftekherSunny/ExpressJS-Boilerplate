@@ -32,3 +32,6 @@ npm-debug.log
 # env file
 .env
 .env.dev
+
+# phpstorm
+.idea
